@@ -1,0 +1,7 @@
+
+
+# 종료하려면
+pkill -f "python main.py"
+
+#실행하려면
+export $(cat .env | xargs) && cd backend && python main.py

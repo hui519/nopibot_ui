@@ -14,7 +14,7 @@ interface Message {
 
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'bot', content: '안녕하세요! 무엇을 도와드릴까요?' }
+    { role: 'bot', content: '안녕하세요! nopi봇🤖 입니다. 무엇을 도와드릴까요?' }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -27,7 +27,7 @@ const Chatbot = () => {
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:8000/chat', {
+      const res = await fetch('http://localhost:8000/kenopi/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: [...messages, userMessage] })
