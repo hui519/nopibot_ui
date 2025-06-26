@@ -1,15 +1,58 @@
+# GCP 배포용 Docker Compose 설정
 version: "3.9"
 
 services:
+  # 백엔드 서비스 (FastAPI + uv)
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: nopibot-backend:latest
-    container_name: nopibot-backend
+    image: kenopi-backend:latest
+    container_name: kenopi-backend
     ports:
       - "8000:8000"
-    env_file:
-      - .env
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY} 
+      # 환경변수는 GCP에서 설정하거나 .env 파일 사용
+      - PYTHONUNBUFFERED=1
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LANGSMITH_API_KEY=${LANGSMITH_API_KEY:-}
+      - LANGSMITH_PROJECT=${LANGSMITH_PROJECT:-kenopi-cs}
+      - LANGSMITH_TRACING_V2=${LANGSMITH_TRACING_V2:-false}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - kenopi-network
+
+  # 프론트엔드 서비스 (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: kenopi-frontend:latest
+    container_name: kenopi-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - kenopi-network
+
+# 네트워크 설정
+networks:
+  kenopi-network:
+    driver: bridge
+
+# 볼륨 설정 (필요시)
+volumes:
+  backend-data:
+    driver: local 

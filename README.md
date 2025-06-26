@@ -30,25 +30,28 @@
 
 ## 🛠️ **설치 및 실행**
 
-### 1. 프로젝트 클론
+### 🖥️ **로컬 개발 환경**
+
+#### 1. 프로젝트 클론
 ```bash
 git clone https://github.com/YOUR_USERNAME/nopibot_ui.git
 cd nopibot_ui
 ```
 
-### 2. 백엔드 설정
+#### 2. 백엔드 설정 (uv 사용)
 ```bash
 cd backend
-pip install -r requirements.txt
+# uv로 의존성 설치
+uv sync
 
 # 환경변수 설정 (선택사항)
 export OPENAI_API_KEY="your-openai-api-key"  # 없어도 FAQ 기반으로 작동
 
 # 서버 실행
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 3. 프론트엔드 설정
+#### 3. 프론트엔드 설정
 ```bash
 cd ../frontend
 npm install
@@ -57,10 +60,62 @@ npm install
 npm run dev
 ```
 
-### 4. 접속
+#### 4. 접속
 - **프론트엔드**: http://localhost:3000
 - **백엔드 API**: http://localhost:8000
 - **API 문서**: http://localhost:8000/docs
+
+### 🐳 **Docker 실행**
+
+```bash
+# Docker Compose로 전체 스택 실행
+docker-compose up --build
+
+# 개별 서비스 실행
+docker-compose up backend  # 백엔드만
+docker-compose up frontend # 프론트엔드만
+```
+
+### ☁️ **GCP 배포**
+
+#### 사전 준비
+1. **GCP 프로젝트 생성** 및 결제 활성화
+2. **gcloud CLI 설치** 및 인증
+3. **Docker 설치** 및 실행
+
+#### 배포 실행
+```bash
+# 환경변수 설정
+export GCP_PROJECT_ID="your-gcp-project-id"
+export GCP_REGION="asia-northeast3"  # 서울 리전
+
+# 배포 스크립트 실행
+./deploy.sh
+```
+
+#### 환경변수 설정 (배포 후)
+```bash
+# OpenAI API 키 설정
+gcloud run services update kenopi-backend \
+  --set-env-vars='OPENAI_API_KEY=your-openai-api-key' \
+  --region asia-northeast3
+
+# LangSmith 설정 (선택사항)
+gcloud run services update kenopi-backend \
+  --set-env-vars='LANGSMITH_API_KEY=your-langsmith-key,LANGSMITH_PROJECT=kenopi-cs' \
+  --region asia-northeast3
+```
+
+#### GCP 리소스 정리
+```bash
+# Cloud Run 서비스 삭제
+gcloud run services delete kenopi-backend --region asia-northeast3
+gcloud run services delete kenopi-frontend --region asia-northeast3
+
+# Container Registry 이미지 삭제
+gcloud container images delete gcr.io/PROJECT_ID/kenopi-backend:latest
+gcloud container images delete gcr.io/PROJECT_ID/kenopi-frontend:latest
+```
 
 ## 🎨 **주요 기능**
 
