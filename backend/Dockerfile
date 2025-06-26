@@ -23,7 +23,7 @@ ENV PATH="/root/.cargo/bin:$PATH"
 COPY pyproject.toml uv.lock ./
 
 # 의존성 설치 (uv sync 사용)
-RUN uv sync --frozen --no-dev
+RUN /root/.cargo/bin/uv sync --frozen --no-dev
 
 # 애플리케이션 코드 복사
 COPY . .
@@ -36,4 +36,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # 애플리케이션 실행 (uv run 사용)
-CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"] 
+CMD ["/root/.cargo/bin/uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"] 

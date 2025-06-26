@@ -1,6 +1,4 @@
 # GCP 배포용 Docker Compose 설정
-version: "3.9"
-
 services:
   # 백엔드 서비스 (FastAPI + uv)
   backend:
