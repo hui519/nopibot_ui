@@ -24,10 +24,17 @@ app = FastAPI(title="Kenopi CS Chatbot API", version="1.0.0")
 # include kenopi router
 app.include_router(kenopi_router)
 
-# CORS 설정
+# CORS 설정 - 카페24 도메인 추가
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://127.0.0.1:3000",
+        "https://imkenopi.cafe24.com",  # 카페24 도메인
+        "http://imkenopi.cafe24.com",   # HTTP 버전도 지원
+        "https://*.cafe24.com",         # 카페24 서브도메인
+        "http://*.cafe24.com"           # HTTP 버전
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
